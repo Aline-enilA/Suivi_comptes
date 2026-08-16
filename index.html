@@ -110,7 +110,7 @@
     <div class="summary-grid">
       <div class="card">
         <h3>Solde Banque Actuel</h3>
-        <input type="number" id="bankBalance" step="0.01" placeholder="0.00" oninput="updateBankBalance(this.value)">
+        <input type="text" inputmode="decimal" id="bankBalance" placeholder="0,00" onchange="updateBankBalance(this.value)">
       </div>
       <div class="card">
         <h3>Dépenses à venir</h3>
@@ -237,11 +237,13 @@
     }
 
     function updateBankBalance(val) {
-      const acc = state.currentAccount;
-      if (acc !== 'epargne') {
-        state.accounts[acc].bankBalance = parseFloat(val) || 0;
-        saveData();
-      }
+  const acc = state.currentAccount;
+
+  if (acc !== 'epargne') {
+    const normalized = String(val).replace(',', '.');
+    state.accounts[acc].bankBalance = parseFloat(normalized) || 0;
+    saveData();
+  }
     }
 
     function updateFixedAmount(id, newAmount) {
