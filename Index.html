@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suivi Solde Réel & Épargne</title>
+  <style>
+    :root {
+      --bg: #f0fdfa;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --primary: #0d9488;      /* Turquoise principal */
+      --primary-light: #ccfbf1;/* Turquoise clair */
+      --anis: #65a30d;         /* Vert Anis (Crédit / Débité) */
+      --anis-bg: #ecfccb;      /* Fond Vert Anis */
+      --framboise: #e11d48;    /* Framboise (Dépense / À venir) */
+      --framboise-bg: #ffe4e6; /* Fond Framboise */
+      --border: #e2e8f0;
+      --off-color: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 20px; max-width: 1100px; margin: 0 auto; }
+
+    h1 { text-align: center; margin-bottom: 25px; color: var(--primary); font-size: 1.9rem; font-weight: 700; }
+
+    /* Navigation comptes */
+    .account-selector { display: flex; gap: 10px; margin-bottom: 25px; justify-content: center; flex-wrap: wrap; }
+    .account-btn {
+      padding: 10px 22px; border: 2px solid var(--primary); background: white;
+      color: var(--primary); border-radius: 25px; cursor: pointer; font-weight: bold; transition: all 0.3s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+    .account-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    /* Cartes de synthèse */
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .card { background: var(--card-bg); padding: 18px; border-radius: 16px; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.08); text-align: center; border: 1px solid var(--primary-light); }
+    .card h3 { font-size: 0.85rem; color: #52525b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .card .amount { font-size: 1.6rem; font-weight: bold; }
+    .card input { font-size: 1.3rem; text-align: center; width: 100%; border: 2px solid var(--primary-light); border-radius: 10px; padding: 6px; font-weight: bold; color: var(--primary); outline: none; }
+    .card input:focus { border-color: var(--primary); }
+
+    /* Layout principal */
+    .main-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .section-box { background: var(--card-bg); padding: 22px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; }
+    .section-box h2 { font-size: 1.2rem; margin-bottom: 18px; border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: var(--primary); }
+
+    .reset-btn { background: var(--primary-light); border: none; padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: bold; color: var(--primary); transition: 0.2s; }
+    .reset-btn:hover { background: var(--primary); color: white; }
+
+    /* Listes */
+    ul { list-style: none; }
+    li { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; border-bottom: 1px solid var(--border); border-radius: 8px; margin-bottom: 4px; transition: background 0.2s; }
+
+    .item-label { font-weight: 600; flex: 1; }
+    .editable-amount { width: 95px; padding: 5px 8px; border: 2px solid var(--primary-light); border-radius: 8px; font-weight: bold; text-align: right; color: var(--text); outline: none; }
+    .editable-amount:focus { border-color: var(--primary); }
+
+    /* Statuts & ON/OFF */
+    .toggle-container { display: flex; align-items: center; gap: 10px; }
+    .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--anis); transition: .3s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    
+    input:checked + .slider { background-color: var(--framboise); }
+    input:checked + .slider:before { transform: translateX(22px); }
+    
+    .status-badge { font-size: 0.75rem; font-weight: bold; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; width: 80px; text-align: center; }
+    .status-badge.pending { background: var(--framboise-bg); color: var(--framboise); }
+    .status-badge.done { background: var(--anis-bg); color: var(--anis); }
+
+    .item-row.done { background-color: #f8fafc; }
+    .item-row.done .item-label { color: var(--anis); text-decoration: line-through; }
+
+    /* Formulaire */
+    form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+    .form-group { display: flex; gap: 10px; }
+    input, select, button { padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; outline: none; }
+    input[type="text"], input[type="number"] { flex: 1; }
+    button.submit-btn { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    button.submit-btn:hover { background: #0f766e; }
+
+    .delete-btn { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 1.2rem; margin-left: 5px; }
+    .delete-btn:hover { color: var(--framboise); }
+
+    /* Interface Épargne */
+    .epargne-view { display: none; }
+    .epargne-total-card { background: var(--primary-light); color: var(--primary); padding: 25px; border-radius: 16px; text-align: center; margin-bottom: 20px; border: 2px solid var(--primary); }
+    .epargne-total-card h2 { font-size: 1.1rem; text-transform: uppercase; margin-bottom: 8px; }
+    .epargne-total-card .total-amount { font-size: 2.5rem; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h1>Suivi Financer & Solde Réel</h1>
+
+  <!-- Sélecteur de compte -->
+  <div class="account-selector">
+    <button class="account-btn active" id="btn-perso" onclick="switchAccount('perso')">Compte Perso</button>
+    <button class="account-btn" id="btn-joint" onclick="switchAccount('joint')">Compte Joint</button>
+    <button class="account-btn" id="btn-epargne" onclick="switchAccount('epargne')">Épargne & Placements</button>
+  </div>
+
+  <!-- VUE COMPTES COURANTS (Perso & Joint) -->
+  <div id="accountView">
+    <div class="summary-grid">
+      <div class="card">
+        <h3>Solde Banque Actuel</h3>
+        <input type="number" id="bankBalance" step="0.01" placeholder="0.00" oninput="updateBankBalance(this.value)">
+      </div>
+      <div class="card">
+        <h3>Dépenses à venir</h3>
+        <div class="amount" id="pendingAmount" style="color: var(--framboise);">0.00 €</div>
+      </div>
+      <div class="card">
+        <h3>Solde Réel Anticipé</h3>
+        <div class="amount" id="realBalance" style="color: var(--primary);">0.00 €</div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <!-- Charges Fixes -->
+      <div class="section-box">
+        <h2>
+          Charges Fixes
+          <button class="reset-btn" onclick="resetFixedExpenses()">Début de mois (Tout ON)</button>
+        </h2>
+        <ul id="fixedList"></ul>
+      </div>
+
+      <!-- Dépenses/Crédits Ponctuels -->
+      <div class="section-box">
+        <h2>Dépenses & Crédits Ponctuels</h2>
+        <form onsubmit="addCustomTransaction(event)">
+          <input type="text" id="desc" placeholder="Ex: Courses, Resto, Vente Vinted..." required>
+          <div class="form-group">
+            <input type="number" id="amount" step="0.01" placeholder="Montant (€)" required>
+            <select id="type">
+              <option value="expense">Dépense (-)</option>
+              <option value="income">Crédit (+)</option>
+            </select>
+          </div>
+          <button type="submit" class="submit-btn">Ajouter l'opération</button>
+        </form>
+        <ul id="customList"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- VUE ÉPARGNE SEULEMENT -->
+  <div id="epargneView" class="epargne-view">
+    <div class="epargne-total-card">
+      <h2>Montant Total de mon Épargne</h2>
+      <div class="total-amount" id="epargneTotal">0.00 €</div>
+    </div>
+
+    <div class="section-box">
+      <h2>Mes Placements & Épargne</h2>
+      <form onsubmit="addPlacement(event)">
+        <div class="form-group">
+          <input type="text" id="placementDesc" placeholder="Nom du placement..." required>
+          <input type="number" id="placementAmount" step="0.01" placeholder="Montant (€)" required>
+          <button type="submit" class="submit-btn">Ajouter un placement</button>
+        </div>
+      </form>
+      <ul id="placementList"></ul>
+    </div>
+  </div>
+
+  <script>
+    const initialFixedPerso = [
+      { id: 'fp1', desc: 'Assurance voiture', amount: -83, pending: true }
+    ];
+
+    const initialFixedJoint = [
+      { id: 'fj1', desc: 'Emprunt maison', amount: -916, pending: true },
+      { id: 'fj2', desc: 'Gasoil', amount: -80, pending: true },
+      { id: 'fj3', desc: 'Assurance emprunteur', amount: -89, pending: true },
+      { id: 'fj4', desc: 'Virement Avery', amount: -35, pending: true },
+      { id: 'fj5', desc: 'Centre loisirs', amount: -170, pending: true },
+      { id: 'fj6', desc: 'Assurance habitation', amount: -40, pending: true },
+      { id: 'fj7', desc: 'Taxe foncière', amount: -94, pending: true },
+      { id: 'fj8', desc: 'Ass. matériel Num.', amount: -4.68, pending: true },
+      { id: 'fj9', desc: 'Orange', amount: -140, pending: true },
+      { id: 'fj10', desc: 'Cantine', amount: -100, pending: true },
+      { id: 'fj11', desc: 'Frais CB', amount: -20, pending: true },
+      { id: 'fj12', desc: 'Croquettes Sanka', amount: -45, pending: true },
+      { id: 'fj13', desc: 'EDF', amount: -180, pending: true },
+      { id: 'fj14', desc: 'Magasine Avery', amount: -5.50, pending: true },
+      { id: 'fj15', desc: 'Eau', amount: -23, pending: true },
+      { id: 'fj16', desc: 'Virement Landry', amount: -35, pending: true }
+    ];
+
+    // Placements issus de votre capture d'écran
+    const initialPlacements = [
+      { id: 'p1', desc: 'LEP', amount: 0 },
+      { id: 'p2', desc: 'Livret A', amount: 0 },
+      { id: 'p3', desc: 'LDD', amount: 0 },
+      { id: 'p4', desc: 'Millevie', amount: 0 },
+      { id: 'p5', desc: 'Swisslife (proximité courtage)', amount: 0 },
+      { id: 'p6', desc: 'Valadeo', amount: 0 }
+    ];
+
+    let defaultState = {
+      currentAccount: 'perso',
+      accounts: {
+        perso: { bankBalance: 0, fixed: JSON.parse(JSON.stringify(initialFixedPerso)), custom: [] },
+        joint: { bankBalance: 0, fixed: JSON.parse(JSON.stringify(initialFixedJoint)), custom: [] }
+      },
+      placements: JSON.parse(JSON.stringify(initialPlacements))
+    };
+
+    let state = JSON.parse(localStorage.getItem('budgetAppData_v6')) || defaultState;
+
+    function saveData() {
+      localStorage.setItem('budgetAppData_v6', JSON.stringify(state));
+      render();
+    }
+
+    function switchAccount(acc) {
+      state.currentAccount = acc;
+      document.querySelectorAll('.account-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-' + acc).classList.add('active');
+
+      if (acc === 'epargne') {
+        document.getElementById('accountView').style.display = 'none';
+        document.getElementById('epargneView').style.display = 'block';
+      } else {
+        document.getElementById('accountView').style.display = 'block';
+        document.getElementById('epargneView').style.display = 'none';
+      }
+      render();
+    }
+
+    function updateBankBalance(val) {
+      const acc = state.currentAccount;
+      if (acc !== 'epargne') {
+        state.accounts[acc].bankBalance = parseFloat(val) || 0;
+        saveData();
+      }
+    }
+
+    function updateFixedAmount(id, newAmount) {
+      const acc = state.currentAccount;
+      const item = state.accounts[acc].fixed.find(f => f.id === id);
+      if (item) {
+        const parsed = parseFloat(newAmount) || 0;
+        item.amount = -Math.abs(parsed);
+        saveData();
+      }
+    }
+
+    function toggleFixed(id) {
+      const acc = state.currentAccount;
+      const item = state.accounts[acc].fixed.find(f => f.id === id);
+      if (item) item.pending = !item.pending;
+      saveData();
+    }
+
+    function resetFixedExpenses() {
+      const acc = state.currentAccount;
+      state.accounts[acc].fixed.forEach(f => f.pending = true);
+      saveData();
+    }
+
+    function addCustomTransaction(e) {
+      e.preventDefault();
+      const desc = document.getElementById('desc').value;
+      const amount = parseFloat(document.getElementById('amount').value);
+      const type = document.getElementById('type').value;
+      const acc = state.currentAccount;
+
+      state.accounts[acc].custom.push({
+        id: 'c_' + Date.now(),
+        desc,
+        amount: type === 'expense' ? -Math.abs(amount) : Math.abs(amount),
+        pending: true
+      });
+
+      document.getElementById('desc').value = '';
+      document.getElementById('amount').value = '';
+      saveData();
+    }
+
+    function toggleCustom(id) {
+      const acc = state.currentAccount;
+      const item = state.accounts[acc].custom.find(c => c.id === id);
+      if (item) item.pending = !item.pending;
+      saveData();
+    }
+
+    function deleteCustom(id) {
+      const acc = state.currentAccount;
+      state.accounts[acc].custom = state.accounts[acc].custom.filter(c => c.id !== id);
+      saveData();
+    }
+
+    /* Épargne */
+    function addPlacement(e) {
+      e.preventDefault();
+      const desc = document.getElementById('placementDesc').value;
+      const amount = parseFloat(document.getElementById('placementAmount').value) || 0;
+
+      state.placements.push({ id: 'p_' + Date.now(), desc, amount });
+      document.getElementById('placementDesc').value = '';
+      document.getElementById('placementAmount').value = '';
+      saveData();
+    }
+
+    function updatePlacementAmount(id, newAmount) {
+      const p = state.placements.find(item => item.id === id);
+      if (p) {
+        p.amount = parseFloat(newAmount) || 0;
+        saveData();
+      }
+    }
+
+    function deletePlacement(id) {
+      state.placements = state.placements.filter(p => p.id !== id);
+      saveData();
+    }
+
+    function render() {
+      const acc = state.currentAccount;
+
+      if (acc === 'epargne') {
+        const placementListEl = document.getElementById('placementList');
+        placementListEl.innerHTML = '';
+        let totalEpargne = 0;
+
+        state.placements.forEach(p => {
+          totalEpargne += p.amount;
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <span class="item-label">${p.desc}</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <input type="number" step="0.01" class="editable-amount" value="${p.amount || ''}" placeholder="0.00" onchange="updatePlacementAmount('${p.id}', this.value)"> €
+              <button class="delete-btn" onclick="deletePlacement('${p.id}')">&times;</button>
+            </div>
+          `;
+          placementListEl.appendChild(li);
+        });
+
+        document.getElementById('epargneTotal').innerText = totalEpargne.toFixed(2) + ' €';
+        return;
+      }
+
+      // Rendu Comptes Perso & Joint
+      const accountData = state.accounts[acc];
+      document.getElementById('bankBalance').value = accountData.bankBalance || '';
+
+      let totalPending = 0;
+
+      const fixedListEl = document.getElementById('fixedList');
+      fixedListEl.innerHTML = '';
+
+      accountData.fixed.forEach(item => {
+        if (item.pending) totalPending += item.amount;
+
+        const li = document.createElement('li');
+        li.className = `item-row ${item.pending ? 'pending' : 'done'}`;
+        li.innerHTML = `
+          <span class="item-label">${item.desc}</span>
+          <div class="toggle-container">
+            <input type="number" step="0.01" class="editable-amount" value="${Math.abs(item.amount)}" onchange="updateFixedAmount('${item.id}', this.value)">
+            <span class="status-badge ${item.pending ? 'pending' : 'done'}">
+              ${item.pending ? 'À venir' : 'Débité'}
+            </span>
+            <label class="switch">
+              <input type="checkbox" ${item.pending ? 'checked' : ''} onchange="toggleFixed('${item.id}')">
+              <span class="slider"></span>
+            </label>
+          </div>
+        `;
+        fixedListEl.appendChild(li);
+      });
+
+      const customListEl = document.getElementById('customList');
+      customListEl.innerHTML = '';
+
+      accountData.custom.forEach(item => {
+        if (item.pending) totalPending += item.amount;
+
+        const isPositive = item.amount > 0;
+        const color = isPositive ? 'var(--anis)' : (item.pending ? 'var(--framboise)' : 'var(--anis)');
+
+        const li = document.createElement('li');
+        li.className = `item-row ${item.pending ? 'pending' : 'done'}`;
+        li.innerHTML = `
+          <span class="item-label">${item.desc}</span>
+          <div class="toggle-container">
+            <span class="item-amount" style="color: ${color}">
+              ${isPositive ? '+' : ''}${item.amount.toFixed(2)} €
+            </span>
+            <span class="status-badge ${item.pending ? 'pending' : 'done'}">
+              ${item.pending ? 'À venir' : 'Passé'}
+            </span>
+            <label class="switch">
+              <input type="checkbox" ${item.pending ? 'checked' : ''} onchange="toggleCustom('${item.id}')">
+              <span class="slider"></span>
+            </label>
+            <button class="delete-btn" onclick="deleteCustom('${item.id}')">&times;</button>
+          </div>
+        `;
+        customListEl.appendChild(li);
+      });
+
+      document.getElementById('pendingAmount').innerText = totalPending.toFixed(2) + ' €';
+      const realBalance = accountData.bankBalance + totalPending;
+      const realBalanceEl = document.getElementById('realBalance');
+      realBalanceEl.innerText = realBalance.toFixed(2) + ' €';
+      realBalanceEl.style.color = realBalance >= 0 ? 'var(--primary)' : 'var(--framboise)';
+    }
+
+    render();
+  </script>
+</body>
+  </html>
+  
