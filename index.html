@@ -175,6 +175,7 @@
     ========================= */
 
     .reset-btn,
+    .backup-btn,
     .history-btn {
       background: var(--primary-light);
       border: none;
@@ -188,6 +189,7 @@
     }
 
     .reset-btn:hover,
+    .backup-btn:hover,
     .history-btn:hover {
       background: var(--primary);
       color: white;
@@ -392,7 +394,7 @@
     .history-header {
       background: var(--primary-light);
       color: var(--primary);
-      padding: 22px;
+      padding: 25px;
       border-radius: 16px;
       text-align: center;
       margin-bottom: 20px;
@@ -406,7 +408,7 @@
     }
 
     .history-total {
-      font-size: 2.3rem;
+      font-size: 2.5rem;
       font-weight: bold;
     }
 
@@ -427,7 +429,7 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 16px;
-      margin-bottom: 12px;
+      margin-bottom: 15px;
     }
 
     .month-card h3 {
@@ -437,7 +439,7 @@
 
     .history-stat-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 10px;
       margin-bottom: 15px;
     }
@@ -472,11 +474,12 @@
       border-radius: 12px;
       padding: 18px;
       margin-top: 15px;
+      line-height: 1.8;
     }
 
     .comparison-box h3 {
       color: var(--primary);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .history-operation {
@@ -497,6 +500,13 @@
       padding: 25px;
     }
 
+    .account-history-title {
+      margin-top: 15px;
+      margin-bottom: 8px;
+      color: var(--primary);
+      font-weight: bold;
+    }
+
     /* =========================
        SAUVEGARDE
     ========================= */
@@ -507,16 +517,12 @@
       flex-wrap: wrap;
     }
 
-    .backup-box button {
-      cursor: pointer;
-      font-weight: bold;
-    }
-
     /* =========================
        MOBILE
     ========================= */
 
     @media (max-width: 600px) {
+
       body {
         padding: 12px;
       }
@@ -527,7 +533,7 @@
 
       .account-btn {
         padding: 9px 12px;
-        font-size: 0.85rem;
+        font-size: 0.82rem;
       }
 
       .toggle-container {
@@ -554,30 +560,37 @@
 
   <h1>Suivi Financier & Solde Réel</h1>
 
-  <!-- NAVIGATION -->
+  <!-- =========================
+       NAVIGATION
+  ========================= -->
+
   <div class="account-selector">
 
-    <button class="account-btn active"
-            id="btn-perso"
-            onclick="switchView('perso')">
+    <button
+      class="account-btn active"
+      id="btn-perso"
+      onclick="switchAccount('perso')">
       Compte Perso
     </button>
 
-    <button class="account-btn"
-            id="btn-joint"
-            onclick="switchView('joint')">
+    <button
+      class="account-btn"
+      id="btn-joint"
+      onclick="switchAccount('joint')">
       Compte Joint
     </button>
 
-    <button class="account-btn"
-            id="btn-epargne"
-            onclick="switchView('epargne')">
+    <button
+      class="account-btn"
+      id="btn-epargne"
+      onclick="switchAccount('epargne')">
       Épargne & Placements
     </button>
 
-    <button class="account-btn"
-            id="btn-historique"
-            onclick="switchView('historique')">
+    <button
+      class="account-btn"
+      id="btn-historique"
+      onclick="switchAccount('historique')">
       📊 Historique
     </button>
 
@@ -585,14 +598,15 @@
 
 
   <!-- =========================
-       COMPTES
+       VUE COMPTES
   ========================= -->
 
-  <div id="accountView" class="view active">
+  <div id="accountView">
 
     <div class="summary-grid">
 
       <div class="card">
+
         <h3>Solde Banque Actuel</h3>
 
         <input
@@ -602,9 +616,12 @@
           placeholder="0,00"
           onchange="updateBankBalance(this.value)"
         >
+
       </div>
 
+
       <div class="card">
+
         <h3>Dépenses à venir</h3>
 
         <div
@@ -613,9 +630,12 @@
           style="color: var(--framboise);">
           0,00 €
         </div>
+
       </div>
 
+
       <div class="card">
+
         <h3>Solde Réel Anticipé</h3>
 
         <div
@@ -624,6 +644,7 @@
           style="color: var(--primary);">
           0,00 €
         </div>
+
       </div>
 
     </div>
@@ -636,13 +657,15 @@
       <div class="section-box">
 
         <h2>
+
           Charges Fixes
 
           <button
             class="reset-btn"
-            onclick="manualMonthReset()">
-            📅 Nouveau mois
+            onclick="startNewMonthManually()">
+            📅 Début de mois
           </button>
+
         </h2>
 
         <ul id="fixedList"></ul>
@@ -650,7 +673,7 @@
       </div>
 
 
-      <!-- DEPENSES -->
+      <!-- DEPENSES / CREDITS -->
 
       <div class="section-box">
 
@@ -712,7 +735,9 @@
        EPARGNE
   ========================= -->
 
-  <div id="epargneView" class="view">
+  <div
+    id="epargneView"
+    class="view">
 
     <div class="epargne-total-card">
 
@@ -757,7 +782,7 @@
           <button
             type="submit"
             class="submit-btn">
-            Ajouter un placement
+            Ajouter
           </button>
 
         </div>
@@ -772,21 +797,21 @@
     <div class="section-box">
 
       <h2>
-        💾 Mes données
+        💾 Sauvegarde
       </h2>
 
       <div class="backup-box">
 
         <button
-          class="history-btn"
+          class="backup-btn"
           onclick="exportData()">
-          💾 Sauvegarder
+          💾 Sauvegarder mes données
         </button>
 
         <button
-          class="history-btn"
+          class="backup-btn"
           onclick="document.getElementById('importFile').click()">
-          📥 Restaurer
+          📥 Restaurer mes données
         </button>
 
         <input
@@ -808,12 +833,14 @@
        HISTORIQUE
   ========================= -->
 
-  <div id="historiqueView" class="view">
+  <div
+    id="historiqueView"
+    class="view">
 
     <div class="history-header">
 
       <h2>
-        Historique des dépenses
+        📊 Historique des dépenses
       </h2>
 
       <div
@@ -823,7 +850,7 @@
       </div>
 
       <small>
-        Dépenses archivées cette année
+        Dépenses archivées
       </small>
 
     </div>
@@ -832,7 +859,7 @@
     <div class="section-box">
 
       <h2>
-        📅 Consulter mes dépenses
+        Consulter mes dépenses
       </h2>
 
       <div class="history-controls">
@@ -875,10 +902,10 @@
     <div class="section-box">
 
       <h2>
-        📈 Comparaison des années
+        📈 Comparaison
       </h2>
 
-      <div id="yearComparison"></div>
+      <div id="comparisonContent"></div>
 
     </div>
 
@@ -892,15 +919,15 @@
       <div class="backup-box">
 
         <button
-          class="history-btn"
+          class="backup-btn"
           onclick="exportData()">
-          💾 Sauvegarder mes données
+          💾 Sauvegarder
         </button>
 
         <button
-          class="history-btn"
+          class="backup-btn"
           onclick="document.getElementById('importFileHistory').click()">
-          📥 Restaurer mes données
+          📥 Restaurer
         </button>
 
         <input
@@ -921,49 +948,180 @@
 <script>
 
   /* ==========================================================
-     DONNEES DE DEPART
+     CHARGES FIXES D'ORIGINE
+     IMPORTANT : elles sont conservées.
   ========================================================== */
 
   const initialFixedPerso = [
+
     {
       id: 'fp1',
       desc: 'Assurance voiture',
       amount: -83,
       pending: true
     }
+
   ];
 
 
   const initialFixedJoint = [
 
-    { id: 'fj1', desc: 'Emprunt maison', amount: -916, pending: true },
-    { id: 'fj2', desc: 'Gasoil', amount: -80, pending: true },
-    { id: 'fj3', desc: 'Assurance emprunteur', amount: -89, pending: true },
-    { id: 'fj4', desc: 'Virement Avery', amount: -35, pending: true },
-    { id: 'fj5', desc: 'Centre loisirs', amount: -170, pending: true },
-    { id: 'fj6', desc: 'Assurance habitation', amount: -40, pending: true },
-    { id: 'fj7', desc: 'Taxe foncière', amount: -94, pending: true },
-    { id: 'fj8', desc: 'Ass. matériel Num.', amount: -4.68, pending: true },
-    { id: 'fj9', desc: 'Orange', amount: -140, pending: true },
-    { id: 'fj10', desc: 'Cantine', amount: -100, pending: true },
-    { id: 'fj11', desc: 'Frais CB', amount: -20, pending: true },
-    { id: 'fj12', desc: 'Croquettes Sanka', amount: -45, pending: true },
-    { id: 'fj13', desc: 'EDF', amount: -180, pending: true },
-    { id: 'fj14', desc: 'Magasine Avery', amount: -5.50, pending: true },
-    { id: 'fj15', desc: 'Eau', amount: -23, pending: true },
-    { id: 'fj16', desc: 'Virement Landry', amount: -35, pending: true }
+    {
+      id: 'fj1',
+      desc: 'Emprunt maison',
+      amount: -916,
+      pending: true
+    },
+
+    {
+      id: 'fj2',
+      desc: 'Gasoil',
+      amount: -80,
+      pending: true
+    },
+
+    {
+      id: 'fj3',
+      desc: 'Assurance emprunteur',
+      amount: -89,
+      pending: true
+    },
+
+    {
+      id: 'fj4',
+      desc: 'Virement Avery',
+      amount: -35,
+      pending: true
+    },
+
+    {
+      id: 'fj5',
+      desc: 'Centre loisirs',
+      amount: -170,
+      pending: true
+    },
+
+    {
+      id: 'fj6',
+      desc: 'Assurance habitation',
+      amount: -40,
+      pending: true
+    },
+
+    {
+      id: 'fj7',
+      desc: 'Taxe foncière',
+      amount: -94,
+      pending: true
+    },
+
+    {
+      id: 'fj8',
+      desc: 'Ass. matériel Num.',
+      amount: -4.68,
+      pending: true
+    },
+
+    {
+      id: 'fj9',
+      desc: 'Orange',
+      amount: -140,
+      pending: true
+    },
+
+    {
+      id: 'fj10',
+      desc: 'Cantine',
+      amount: -100,
+      pending: true
+    },
+
+    {
+      id: 'fj11',
+      desc: 'Frais CB',
+      amount: -20,
+      pending: true
+    },
+
+    {
+      id: 'fj12',
+      desc: 'Croquettes Sanka',
+      amount: -45,
+      pending: true
+    },
+
+    {
+      id: 'fj13',
+      desc: 'EDF',
+      amount: -180,
+      pending: true
+    },
+
+    {
+      id: 'fj14',
+      desc: 'Magasine Avery',
+      amount: -5.50,
+      pending: true
+    },
+
+    {
+      id: 'fj15',
+      desc: 'Eau',
+      amount: -23,
+      pending: true
+    },
+
+    {
+      id: 'fj16',
+      desc: 'Virement Landry',
+      amount: -35,
+      pending: true
+    }
 
   ];
 
 
+  /* ==========================================================
+     PLACEMENTS
+  ========================================================== */
+
   const initialPlacements = [
 
-    { id: 'p1', desc: 'LEP', amount: 0 },
-    { id: 'p2', desc: 'Livret A', amount: 0 },
-    { id: 'p3', desc: 'LDD', amount: 0 },
-    { id: 'p4', desc: 'Millevie', amount: 0 },
-    { id: 'p5', desc: 'Swisslife (proximité courtage)', amount: 0 },
-    { id: 'p6', desc: 'Valadeo', amount: 0 }
+    {
+      id: 'p1',
+      desc: 'LEP',
+      amount: 0
+    },
+
+    {
+      id: 'p2',
+      desc: 'Livret A',
+      amount: 0
+    },
+
+    {
+      id: 'p3',
+      desc: 'LDD',
+      amount: 0
+    },
+
+    {
+      id: 'p4',
+      desc: 'Millevie',
+      amount: 0
+    },
+
+    {
+      id: 'p5',
+      desc: 'Swisslife (proximité courtage)',
+      amount: 0
+    },
+
+    {
+      id: 'p6',
+      desc: 'Valadeo',
+      amount: 0
+    }
 
   ];
 
@@ -979,7 +1137,9 @@
     return (
       now.getFullYear() +
       '-' +
-      String(now.getMonth() + 1).padStart(2, '0')
+      String(
+        now.getMonth() + 1
+      ).padStart(2, '0')
     );
 
   }
@@ -987,13 +1147,15 @@
 
   function formatMonth(monthKey) {
 
-    const parts = monthKey.split('-');
+    const parts =
+      monthKey.split('-');
 
-    const date = new Date(
-      Number(parts[0]),
-      Number(parts[1]) - 1,
-      1
-    );
+    const date =
+      new Date(
+        Number(parts[0]),
+        Number(parts[1]) - 1,
+        1
+      );
 
     return date.toLocaleDateString(
       'fr-FR',
@@ -1006,14 +1168,2506 @@
   }
 
 
+  function capitalize(text) {
+
+    return text.charAt(0).toUpperCase() +
+      text.slice(1);
+
+  }
+
+
   /* ==========================================================
-     ETAT INITIAL
+     ETAT
   ========================================================== */
 
-  const oldData =
-    JSON.parse(
-      localStorage.getItem('budgetAppData_v6')
+  const savedData =
+    localStorage.getItem(
+      'budgetAppData_v6'
     );
 
 
-  let defau
+  let state;
+
+  if (savedData) {
+
+    try {
+
+      state =
+        JSON.parse(savedData);
+
+    } catch (error) {
+
+      state = null;
+
+    }
+
+  }
+
+
+  if (!state) {
+
+    state = {
+
+      currentAccount: 'perso',
+
+      currentMonth:
+        getCurrentMonthKey(),
+
+      accounts: {
+
+        perso: {
+          bankBalance: 0,
+          fixed:
+            JSON.parse(
+              JSON.stringify(
+                initialFixedPerso
+              )
+            ),
+          custom: []
+        },
+
+        joint: {
+          bankBalance: 0,
+          fixed:
+            JSON.parse(
+              JSON.stringify(
+                initialFixedJoint
+              )
+            ),
+          custom: []
+        }
+
+      },
+
+      placements:
+        JSON.parse(
+          JSON.stringify(
+            initialPlacements
+          )
+        ),
+
+      history: []
+
+    };
+
+  }
+
+
+  /* ==========================================================
+     MIGRATION / SECURITE
+     On ne supprime JAMAIS les charges existantes.
+  ========================================================== */
+
+  if (!state.currentMonth) {
+
+    state.currentMonth =
+      getCurrentMonthKey();
+
+  }
+
+
+  if (!state.history) {
+
+    state.history = [];
+
+  }
+
+
+  if (!state.accounts) {
+
+    state.accounts = {};
+
+  }
+
+
+  if (!state.accounts.perso) {
+
+    state.accounts.perso = {
+
+      bankBalance: 0,
+
+      fixed:
+        JSON.parse(
+          JSON.stringify(
+            initialFixedPerso
+          )
+        ),
+
+      custom: []
+
+    };
+
+  }
+
+
+  if (!state.accounts.joint) {
+
+    state.accounts.joint = {
+
+      bankBalance: 0,
+
+      fixed:
+        JSON.parse(
+          JSON.stringify(
+            initialFixedJoint
+          )
+        ),
+
+      custom: []
+
+    };
+
+  }
+
+
+  if (!Array.isArray(
+    state.accounts.perso.fixed
+  )) {
+
+    state.accounts.perso.fixed =
+      JSON.parse(
+        JSON.stringify(
+          initialFixedPerso
+        )
+      );
+
+  }
+
+
+  if (!Array.isArray(
+    state.accounts.joint.fixed
+  )) {
+
+    state.accounts.joint.fixed =
+      JSON.parse(
+        JSON.stringify(
+          initialFixedJoint
+        )
+      );
+
+  }
+
+
+  if (!Array.isArray(
+    state.accounts.perso.custom
+  )) {
+
+    state.accounts.perso.custom = [];
+
+  }
+
+
+  if (!Array.isArray(
+    state.accounts.joint.custom
+  )) {
+
+    state.accounts.joint.custom = [];
+
+  }
+
+
+  if (!Array.isArray(
+    state.placements
+  )) {
+
+    state.placements =
+      JSON.parse(
+        JSON.stringify(
+          initialPlacements
+        )
+      );
+
+  }
+
+
+  /* ==========================================================
+     MONTANTS
+  ========================================================== */
+
+  function parseAmount(value) {
+
+    if (
+      value === null ||
+      value === undefined ||
+      value === ''
+    ) {
+
+      return 0;
+
+    }
+
+
+    const normalized =
+      String(value)
+        .replace(/\s/g, '')
+        .replace(',', '.');
+
+
+    return (
+      parseFloat(normalized) ||
+      0
+    );
+
+  }
+
+
+  function formatAmount(value) {
+
+    return Number(value || 0)
+      .toLocaleString(
+        'fr-FR',
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }
+      ) + ' €';
+
+  }
+
+
+  function inputAmount(value) {
+
+    if (
+      value === null ||
+      value === undefined
+    ) {
+
+      return '';
+
+    }
+
+    return String(value)
+      .replace('.', ',');
+
+  }
+
+
+  /* ==========================================================
+     SAUVEGARDE
+  ========================================================== */
+
+  function saveData() {
+
+    localStorage.setItem(
+      'budgetAppData_v6',
+      JSON.stringify(state)
+    );
+
+    render();
+
+  }
+
+
+  /* ==========================================================
+     NAVIGATION
+  ========================================================== */
+
+  function switchAccount(account) {
+
+    state.currentAccount =
+      account;
+
+
+    document
+      .querySelectorAll(
+        '.account-btn'
+      )
+      .forEach(
+        button =>
+          button.classList.remove(
+            'active'
+          )
+      );
+
+
+    document
+      .getElementById(
+        'btn-' + account
+      )
+      .classList.add(
+        'active'
+      );
+
+
+    if (
+      account === 'historique'
+    ) {
+
+      document
+        .getElementById(
+          'accountView'
+        )
+        .classList.remove(
+          'active'
+        );
+
+      document
+        .getElementById(
+          'epargneView'
+        )
+        .classList.remove(
+          'active'
+        );
+
+      document
+        .getElementById(
+          'historiqueView'
+        )
+        .classList.add(
+          'active'
+        );
+
+      prepareHistorySelectors();
+
+      renderHistory();
+
+    }
+
+    else if (
+      account === 'epargne'
+    ) {
+
+      document
+        .getElementById(
+          'accountView'
+        )
+        .classList.remove(
+          'active'
+        );
+
+      document
+        .getElementById(
+          'historiqueView'
+        )
+        .classList.remove(
+          'active'
+        );
+
+      document
+        .getElementById(
+          'epargneView'
+        )
+        .classList.add(
+          'active'
+        );
+
+    }
+
+    else {
+
+      document
+        .getElementById(
+          'historiqueView'
+        )
+        .classList.remove(
+          'active'
+        );
+
+      document
+        .getElementById(
+          'epargneView'
+        )
+        .classList.remove(
+          'active'
+        );
+
+      document
+        .getElementById(
+          'accountView'
+        )
+        .classList.add(
+          'active'
+        );
+
+    }
+
+
+    render();
+
+  }
+
+
+  /* ==========================================================
+     SOLDE
+  ========================================================== */
+
+  function updateBankBalance(value) {
+
+    const account =
+      state.currentAccount;
+
+
+    if (
+      account !== 'perso' &&
+      account !== 'joint'
+    ) {
+
+      return;
+
+    }
+
+
+    state.accounts[
+      account
+    ].bankBalance =
+      parseAmount(value);
+
+
+    saveData();
+
+  }
+
+
+  /* ==========================================================
+     CHARGES FIXES
+  ========================================================== */
+
+  function updateFixedAmount(
+    id,
+    value
+  ) {
+
+    const account =
+      state.currentAccount;
+
+
+    const item =
+      state.accounts[
+        account
+      ].fixed.find(
+        item =>
+          item.id === id
+      );
+
+
+    if (item) {
+
+      item.amount =
+        -Math.abs(
+          parseAmount(value)
+        );
+
+
+      saveData();
+
+    }
+
+  }
+
+
+  function toggleFixed(id) {
+
+    const account =
+      state.currentAccount;
+
+
+    const item =
+      state.accounts[
+        account
+      ].fixed.find(
+        item =>
+          item.id === id
+      );
+
+
+    if (item) {
+
+      item.pending =
+        !item.pending;
+
+    }
+
+
+    saveData();
+
+  }
+
+
+  /* ==========================================================
+     DEPENSES / CREDITS
+  ========================================================== */
+
+  function addCustomTransaction(event) {
+
+    event.preventDefault();
+
+
+    const desc =
+      document
+        .getElementById(
+          'desc'
+        )
+        .value
+        .trim();
+
+
+    const amount =
+      parseAmount(
+        document
+          .getElementById(
+            'amount'
+          )
+          .value
+      );
+
+
+    const type =
+      document
+        .getElementById(
+          'type'
+        )
+        .value;
+
+
+    const account =
+      state.currentAccount;
+
+
+    if (
+      !desc ||
+      amount <= 0
+    ) {
+
+      return;
+
+    }
+
+
+    state.accounts[
+      account
+    ].custom.push({
+
+      id:
+        'c_' +
+        Date.now(),
+
+      desc,
+
+      amount:
+        type === 'expense'
+          ? -Math.abs(amount)
+          : Math.abs(amount),
+
+      pending: true
+
+    });
+
+
+    document
+      .getElementById(
+        'desc'
+      )
+      .value = '';
+
+
+    document
+      .getElementById(
+        'amount'
+      )
+      .value = '';
+
+
+    saveData();
+
+  }
+
+
+  function toggleCustom(id) {
+
+    const account =
+      state.currentAccount;
+
+
+    const item =
+      state.accounts[
+        account
+      ].custom.find(
+        item =>
+          item.id === id
+      );
+
+
+    if (item) {
+
+      item.pending =
+        !item.pending;
+
+    }
+
+
+    saveData();
+
+  }
+
+
+  function deleteCustom(id) {
+
+    const account =
+      state.currentAccount;
+
+
+    state.accounts[
+      account
+    ].custom =
+      state.accounts[
+        account
+      ].custom.filter(
+        item =>
+          item.id !== id
+      );
+
+
+    saveData();
+
+  }
+
+
+  /* ==========================================================
+     EPARGNE
+  ========================================================== */
+
+  function addPlacement(event) {
+
+    event.preventDefault();
+
+
+    const desc =
+      document
+        .getElementById(
+          'placementDesc'
+        )
+        .value
+        .trim();
+
+
+    const amount =
+      parseAmount(
+        document
+          .getElementById(
+            'placementAmount'
+          )
+          .value
+      );
+
+
+    if (
+      !desc ||
+      amount < 0
+    ) {
+
+      return;
+
+    }
+
+
+    state.placements.push({
+
+      id:
+        'p_' +
+        Date.now(),
+
+      desc,
+
+      amount
+
+    });
+
+
+    document
+      .getElementById(
+        'placementDesc'
+      )
+      .value = '';
+
+
+    document
+      .getElementById(
+        'placementAmount'
+      )
+      .value = '';
+
+
+    saveData();
+
+  }
+
+
+  function updatePlacementAmount(
+    id,
+    value
+  ) {
+
+    const placement =
+      state.placements.find(
+        item =>
+          item.id === id
+      );
+
+
+    if (placement) {
+
+      placement.amount =
+        parseAmount(value);
+
+      saveData();
+
+    }
+
+  }
+
+
+  function deletePlacement(id) {
+
+    state.placements =
+      state.placements.filter(
+        item =>
+          item.id !== id
+      );
+
+
+    saveData();
+
+  }
+
+
+  /* ==========================================================
+     ARCHIVAGE DU MOIS
+     
+     IMPORTANT :
+     - les charges fixes restent dans les comptes
+     - elles ne sont JAMAIS supprimées
+     - seules les opérations ponctuelles sont vidées
+     - les charges fixes sont archivées seulement si elles
+       ont été marquées "Débité"
+  ========================================================== */
+
+  function archiveCurrentMonth() {
+
+    const month =
+      state.currentMonth;
+
+
+    const existing =
+      state.history.find(
+        item =>
+          item.month === month
+      );
+
+
+    const operations = [];
+
+
+    ['perso', 'joint']
+      .forEach(
+        accountName => {
+
+          const account =
+            state.accounts[
+              accountName
+            ];
+
+
+          /* Charges fixes réellement débitées */
+
+          account.fixed
+            .forEach(
+              item => {
+
+                if (
+                  !item.pending
+                ) {
+
+                  operations.push({
+
+                    account:
+                      accountName,
+
+                    desc:
+                      item.desc,
+
+                    amount:
+                      item.amount,
+
+                    type:
+                      'expense',
+
+                    category:
+                      'Charge fixe'
+
+                  });
+
+                }
+
+              }
+            );
+
+
+          /* Dépenses et crédits ponctuels */
+
+          account.custom
+            .forEach(
+              item => {
+
+                operations.push({
+
+                  account:
+                    accountName,
+
+                  desc:
+                    item.desc,
+
+                  amount:
+                    item.amount,
+
+                  type:
+                    item.amount < 0
+                      ? 'expense'
+                      : 'income',
+
+                  category:
+                    'Ponctuel'
+
+                });
+
+              }
+            );
+
+        }
+      );
+
+
+    const totalExpenses =
+      operations
+        .filter(
+          operation =>
+            operation.amount < 0
+        )
+        .reduce(
+          (total, operation) =>
+            total +
+            Math.abs(
+              operation.amount
+            ),
+          0
+        );
+
+
+    const totalIncome =
+      operations
+        .filter(
+          operation =>
+            operation.amount > 0
+        )
+        .reduce(
+          (total, operation) =>
+            total +
+            operation.amount,
+          0
+        );
+
+
+    const archive = {
+
+      month,
+
+      operations,
+
+      totalExpenses,
+
+      totalIncome,
+
+      balance:
+        totalIncome -
+        totalExpenses,
+
+      archivedAt:
+        new Date().toISOString()
+
+    };
+
+
+    if (existing) {
+
+      const index =
+        state.history.indexOf(
+          existing
+        );
+
+
+      state.history[index] =
+        archive;
+
+    }
+
+    else {
+
+      state.history.push(
+        archive
+      );
+
+    }
+
+  }
+
+
+  /* ==========================================================
+     NOUVEAU MOIS
+     
+     LES CHARGES FIXES NE SONT PAS SUPPRIMEES.
+  ========================================================== */
+
+  function resetForNewMonth(
+    newMonth
+  ) {
+
+    ['perso', 'joint']
+      .forEach(
+        accountName => {
+
+          const account =
+            state.accounts[
+              accountName
+            ];
+
+
+          /*
+            On remet le solde à zéro.
+          */
+
+          account.bankBalance = 0;
+
+
+          /*
+            On remet TOUTES les charges fixes
+            à "À venir".
+            
+            Elles restent exactement là
+            avec leur montant.
+          */
+
+          account.fixed
+            .forEach(
+              item => {
+
+                item.pending =
+                  true;
+
+              }
+            );
+
+
+          /*
+            On vide uniquement les
+            dépenses/crédits ponctuels
+            déjà archivés.
+          */
+
+          account.custom = [];
+
+        }
+      );
+
+
+    state.currentMonth =
+      newMonth;
+
+
+    saveData();
+
+  }
+
+
+  function startNewMonthManually() {
+
+    const current =
+      formatMonth(
+        state.currentMonth
+      );
+
+
+    const confirmed =
+      confirm(
+        '📅 Clôturer ' +
+        current +
+        ' ?\n\n' +
+        'Les opérations du mois seront enregistrées dans Historique.\n\n' +
+        'Tes charges fixes resteront en place et seront simplement remises sur "À venir".\n\n' +
+        'Continuer ?'
+      );
+
+
+    if (!confirmed) {
+
+      return;
+
+    }
+
+
+    archiveCurrentMonth();
+
+
+    const currentDate =
+      new Date(
+        Number(
+          state.currentMonth
+            .split('-')[0]
+        ),
+        Number(
+          state.currentMonth
+            .split('-')[1]
+        ) - 1,
+        1
+      );
+
+
+    currentDate.setMonth(
+      currentDate.getMonth() + 1
+    );
+
+
+    const nextMonth =
+      currentDate.getFullYear() +
+      '-' +
+      String(
+        currentDate.getMonth() + 1
+      ).padStart(
+        2,
+        '0'
+      );
+
+
+    resetForNewMonth(
+      nextMonth
+    );
+
+
+    alert(
+      '✅ ' +
+      capitalize(
+        current
+      ) +
+      ' est archivé.\n\n' +
+      'Les charges fixes sont conservées et remises "À venir".\n\n' +
+      'Le nouveau mois est prêt.'
+    );
+
+  }
+
+
+  /* ==========================================================
+     DETECTION AUTOMATIQUE
+  ========================================================== */
+
+  function checkNewMonth() {
+
+    const realMonth =
+      getCurrentMonthKey();
+
+
+    if (
+      state.currentMonth ===
+      realMonth
+    ) {
+
+      return;
+
+    }
+
+
+    const previous =
+      formatMonth(
+        state.currentMonth
+      );
+
+
+    const confirmed =
+      confirm(
+        '📅 Nouveau mois détecté !\n\n' +
+        'Nous sommes maintenant en ' +
+        capitalize(
+          formatMonth(
+            realMonth
+          )
+        ) +
+        '.\n\n' +
+        'Voulez-vous archiver ' +
+        previous +
+        ' et commencer le nouveau mois ?\n\n' +
+        'Tes charges fixes seront conservées.'
+      );
+
+
+    if (!confirmed) {
+
+      return;
+
+    }
+
+
+    archiveCurrentMonth();
+
+
+    resetForNewMonth(
+      realMonth
+    );
+
+  }
+
+
+  /* ==========================================================
+     HISTORIQUE - SELECTEURS
+  ========================================================== */
+
+  function prepareHistorySelectors() {
+
+    const select =
+      document
+        .getElementById(
+          'historyYear'
+        );
+
+
+    const currentYear =
+      String(
+        new Date()
+          .getFullYear()
+      );
+
+
+    const years =
+      new Set();
+
+
+    state.history
+      .forEach(
+        item => {
+
+          years.add(
+            item.month
+              .split('-')[0]
+          );
+
+        }
+      );
+
+
+    years.add(
+      currentYear
+    );
+
+
+    const sorted =
+      Array.from(
+        years
+      ).sort(
+        (a, b) =>
+          Number(b) -
+          Number(a)
+      );
+
+
+    const oldValue =
+      select.value ||
+      currentYear;
+
+
+    select.innerHTML = '';
+
+
+    sorted.forEach(
+      year => {
+
+        const option =
+          document.createElement(
+            'option'
+          );
+
+        option.value =
+          year;
+
+        option.textContent =
+          year;
+
+        select.appendChild(
+          option
+        );
+
+      }
+    );
+
+
+    if (
+      sorted.includes(
+        oldValue
+      )
+    ) {
+
+      select.value =
+        oldValue;
+
+    }
+
+  }
+
+
+  /* ==========================================================
+     HISTORIQUE - AFFICHAGE
+  ========================================================== */
+
+  function renderHistory() {
+
+    const year =
+      document
+        .getElementById(
+          'historyYear'
+        )
+        .value;
+
+
+    const month =
+      document
+        .getElementById(
+          'historyMonth'
+        )
+        .value;
+
+
+    const matching =
+      state.history
+        .filter(
+          item => {
+
+            if (
+              !item.month.startsWith(
+                year + '-'
+              )
+            ) {
+
+              return false;
+
+            }
+
+
+            if (
+              month === 'all'
+            ) {
+
+              return true;
+
+            }
+
+
+            return (
+              item.month ===
+              year + '-' + month
+            );
+
+          }
+        )
+        .sort(
+          (a, b) =>
+            b.month.localeCompare(
+              a.month
+            )
+        );
+
+
+    const annual =
+      state.history
+        .filter(
+          item =>
+            item.month.startsWith(
+              year + '-'
+            )
+        )
+        .reduce(
+          (total, item) =>
+            total +
+            item.totalExpenses,
+          0
+        );
+
+
+    document
+      .getElementById(
+        'historyAnnualTotal'
+      )
+      .textContent =
+      formatAmount(
+        annual
+      );
+
+
+    const content =
+      document
+        .getElementById(
+          'historyContent'
+        );
+
+
+    content.innerHTML = '';
+
+
+    if (
+      matching.length === 0
+    ) {
+
+      content.innerHTML = `
+        <div class="history-empty">
+          Aucun historique pour cette période.
+          <br><br>
+          Ton premier mois apparaîtra ici
+          lorsque tu l'auras clôturé.
+        </div>
+      `;
+
+      renderComparison();
+
+      return;
+
+    }
+
+
+    matching.forEach(
+      history => {
+
+        const card =
+          document.createElement(
+            'div'
+          );
+
+
+        card.className =
+          'month-card';
+
+
+        const expenses =
+          history.operations
+            .filter(
+              item =>
+                item.amount < 0
+            );
+
+
+        const incomes =
+          history.operations
+            .filter(
+              item =>
+                item.amount > 0
+            );
+
+
+        let details = '';
+
+
+        ['perso', 'joint']
+          .forEach(
+            accountName => {
+
+              const operations =
+                history.operations
+                  .filter(
+                    item =>
+                      item.account ===
+                      accountName
+                  );
+
+
+              if (
+                operations.length === 0
+              ) {
+
+                return;
+
+              }
+
+
+              details += `
+
+                <div class="account-history-title">
+
+                  ${
+                    accountName === 'perso'
+                      ? 'Compte Perso'
+                      : 'Compte Joint'
+                  }
+
+                </div>
+
+              `;
+
+
+              operations.forEach(
+                operation => {
+
+                  details += `
+
+                    <div class="history-operation">
+
+                      <span>
+
+                        ${escapeHtml(
+                          operation.desc
+                        )}
+
+                        <small>
+                          ${
+                            operation.category
+                          }
+                        </small>
+
+                      </span>
+
+                      <strong class="${
+                        operation.amount >= 0
+                          ? 'history-income'
+                          : 'history-expense'
+                      }">
+
+                        ${
+                          operation.amount > 0
+                            ? '+'
+                            : ''
+                        }${formatAmount(
+                          operation.amount
+                        )}
+
+                      </strong>
+
+                    </div>
+
+                  `;
+
+                }
+              );
+
+            }
+          );
+
+
+        card.innerHTML = `
+
+          <h3>
+            ${capitalize(
+              formatMonth(
+                history.month
+              )
+            )}
+          </h3>
+
+
+          <div class="history-stat-grid">
+
+            <div class="history-stat">
+
+              <small>
+                Dépenses
+              </small>
+
+              <strong
+                class="history-expense">
+
+                ${formatAmount(
+                  history.totalExpenses
+                )}
+
+              </strong>
+
+            </div>
+
+
+            <div class="history-stat">
+
+              <small>
+                Crédits
+              </small>
+
+              <strong
+                class="history-income">
+
+                +${formatAmount(
+                  history.totalIncome
+                )}
+
+              </strong>
+
+            </div>
+
+
+            <div class="history-stat">
+
+              <small>
+                Opérations
+              </small>
+
+              <strong>
+                ${history.operations.length}
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <details>
+
+            <summary>
+              Voir le détail des dépenses
+            </summary>
+
+            <div style="margin-top:12px;">
+
+              ${details}
+
+            </div>
+
+          </details>
+
+        `;
+
+
+        content.appendChild(
+          card
+        );
+
+      }
+    );
+
+
+    renderComparison();
+
+  }
+
+
+  /* ==========================================================
+     COMPARAISON
+  ========================================================== */
+
+  function renderComparison() {
+
+    const container =
+      document
+        .getElementById(
+          'comparisonContent'
+        );
+
+
+    const histories =
+      state.history
+        .slice()
+        .sort(
+          (a, b) =>
+            a.month.localeCompare(
+              b.month
+            )
+        );
+
+
+    if (
+      histories.length === 0
+    ) {
+
+      container.innerHTML = `
+        <div class="history-empty">
+          Pas encore de données à comparer.
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    let html = '';
+
+
+    histories.forEach(
+      history => {
+
+        html += `
+
+          <div class="month-card">
+
+            <div style="
+              display:flex;
+              justify-content:space-between;
+              gap:10px;
+              align-items:center;
+            ">
+
+              <span>
+
+                ${capitalize(
+                  formatMonth(
+                    history.month
+                  )
+                )}
+
+              </span>
+
+              <strong
+                class="history-expense">
+
+                ${formatAmount(
+                  history.totalExpenses
+                )}
+
+              </strong>
+
+            </div>
+
+          </div>
+
+        `;
+
+      }
+    );
+
+
+    const total =
+      histories.reduce(
+        (sum, history) =>
+          sum +
+          history.totalExpenses,
+        0
+      );
+
+
+    const average =
+      total /
+      histories.length;
+
+
+    let evolutionHTML =
+      '';
+
+
+    if (
+      histories.length >= 2
+    ) {
+
+      const last =
+        histories[
+          histories.length - 1
+        ];
+
+
+      const previous =
+        histories[
+          histories.length - 2
+        ];
+
+
+      const difference =
+        last.totalExpenses -
+        previous.totalExpenses;
+
+
+      const percentage =
+        previous.totalExpenses !== 0
+          ? (
+              difference /
+              previous.totalExpenses
+            ) * 100
+          : 0;
+
+
+      const direction =
+        difference > 0
+          ? '📈 Tu as dépensé davantage'
+          : difference < 0
+            ? '📉 Tu as dépensé moins'
+            : '➡️ Tes dépenses sont identiques';
+
+
+      evolutionHTML = `
+
+        <p>
+          <strong>
+            ${direction}
+          </strong>
+        </p>
+
+        <p>
+          Écart :
+          <strong>
+            ${formatAmount(
+              Math.abs(difference)
+            )}
+          </strong>
+          (${Math.abs(
+            percentage
+          ).toFixed(1)} %)
+        </p>
+
+      `;
+
+    }
+
+
+    container.innerHTML = `
+
+      ${html}
+
+      <div class="comparison-box">
+
+        <h3>
+          📊 Résumé global
+        </h3>
+
+        <p>
+          Mois archivés :
+          <strong>
+            ${histories.length}
+          </strong>
+        </p>
+
+        <p>
+          Total dépensé :
+          <strong
+            class="history-expense">
+
+            ${formatAmount(
+              total
+            )}
+
+          </strong>
+        </p>
+
+        <p>
+          Moyenne mensuelle :
+          <strong>
+
+            ${formatAmount(
+              average
+            )}
+
+          </strong>
+        </p>
+
+        ${evolutionHTML}
+
+      </div>
+
+    `;
+
+  }
+
+
+  /* ==========================================================
+     SECURITE AFFICHAGE
+  ========================================================== */
+
+  function escapeHtml(text) {
+
+    return String(text)
+      .replace(
+        /&/g,
+        '&amp;'
+      )
+      .replace(
+        /</g,
+        '&lt;'
+      )
+      .replace(
+        />/g,
+        '&gt;'
+      )
+      .replace(
+        /"/g,
+        '&quot;'
+      )
+      .replace(
+        /'/g,
+        '&#039;'
+      );
+
+  }
+
+
+  /* ==========================================================
+     EXPORT
+  ========================================================== */
+
+  function exportData() {
+
+    const data =
+      JSON.stringify(
+        state,
+        null,
+        2
+      );
+
+
+    const blob =
+      new Blob(
+        [data],
+        {
+          type:
+            'application/json'
+        }
+      );
+
+
+    const url =
+      URL.createObjectURL(
+        blob
+      );
+
+
+    const link =
+      document.createElement(
+        'a'
+      );
+
+
+    link.href =
+      url;
+
+
+    link.download =
+      'sauvegarde-suivi-financier-' +
+      getCurrentMonthKey() +
+      '.json';
+
+
+    document.body.appendChild(
+      link
+    );
+
+
+    link.click();
+
+
+    document.body.removeChild(
+      link
+    );
+
+
+    URL.revokeObjectURL(
+      url
+    );
+
+  }
+
+
+  /* ==========================================================
+     IMPORT
+  ========================================================== */
+
+  function importData(event) {
+
+    const file =
+      event.target.files[0];
+
+
+    if (!file) {
+
+      return;
+
+    }
+
+
+    const reader =
+      new FileReader();
+
+
+    reader.onload =
+      function() {
+
+        try {
+
+          const imported =
+            JSON.parse(
+              reader.result
+            );
+
+
+          if (
+            !imported.accounts ||
+            !imported.placements
+          ) {
+
+            throw new Error(
+              'Sauvegarde invalide'
+            );
+
+          }
+
+
+          const confirmed =
+            confirm(
+              '⚠️ Restaurer cette sauvegarde ?\n\n' +
+              'Les données actuellement présentes seront remplacées.'
+            );
+
+
+          if (!confirmed) {
+
+            return;
+
+          }
+
+
+          state =
+            imported;
+
+
+          if (!state.history) {
+
+            state.history = [];
+
+          }
+
+
+          if (!state.currentMonth) {
+
+            state.currentMonth =
+              getCurrentMonthKey();
+
+          }
+
+
+          saveData();
+
+
+          alert(
+            '✅ Sauvegarde restaurée avec succès.'
+          );
+
+
+        }
+
+        catch(error) {
+
+          alert(
+            '❌ Impossible de restaurer cette sauvegarde.'
+          );
+
+        }
+
+      };
+
+
+    reader.readAsText(
+      file
+    );
+
+
+    event.target.value = '';
+
+  }
+
+
+  /* ==========================================================
+     RENDU
+  ========================================================== */
+
+  function render() {
+
+    const account =
+      state.currentAccount;
+
+
+    /* ======================
+       EPARGNE
+    ====================== */
+
+    if (
+      account === 'epargne'
+    ) {
+
+      const list =
+        document
+          .getElementById(
+            'placementList'
+          );
+
+
+      list.innerHTML =
+        '';
+
+
+      let total = 0;
+
+
+      state.placements
+        .forEach(
+          placement => {
+
+            total +=
+              Number(
+                placement.amount
+              ) || 0;
+
+
+            const li =
+              document.createElement(
+                'li'
+              );
+
+
+            li.innerHTML = `
+
+              <span class="item-label">
+
+                ${escapeHtml(
+                  placement.desc
+                )}
+
+              </span>
+
+              <div style="
+                display:flex;
+                align-items:center;
+                gap:8px;
+              ">
+
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  class="editable-amount"
+                  value="${
+                    placement.amount
+                      ? inputAmount(
+                          placement.amount
+                        )
+                      : ''
+                  }"
+                  placeholder="0,00"
+                  onchange="updatePlacementAmount(
+                    '${placement.id}',
+                    this.value
+                  )"
+                >
+
+                <span>
+                  €
+                </span>
+
+                <button
+                  class="delete-btn"
+                  onclick="deletePlacement(
+                    '${placement.id}'
+                  )">
+
+                  &times;
+
+                </button>
+
+              </div>
+
+            `;
+
+
+            list.appendChild(
+              li
+            );
+
+          }
+        );
+
+
+      document
+        .getElementById(
+          'epargneTotal'
+        )
+        .innerText =
+        formatAmount(
+          total
+        );
+
+
+      return;
+
+    }
+
+
+    /* ======================
+       HISTORIQUE
+    ====================== */
+
+    if (
+      account === 'historique'
+    ) {
+
+      prepareHistorySelectors();
+
+      renderHistory();
+
+      return;
+
+    }
+
+
+    /* ======================
+       COMPTES
+    ====================== */
+
+    const accountData =
+      state.accounts[
+        account
+      ];
+
+
+    document
+      .getElementById(
+        'bankBalance'
+      )
+      .value =
+      accountData.bankBalance
+        ? inputAmount(
+            accountData.bankBalance
+          )
+        : '';
+
+
+    let totalPending =
+      0;
+
+
+    /* ======================
+       CHARGES FIXES
+       
+       IMPORTANT :
+       ON LES CONSERVE.
+    ====================== */
+
+    const fixedList =
+      document
+        .getElementById(
+          'fixedList'
+        );
+
+
+    fixedList.innerHTML =
+      '';
+
+
+    accountData.fixed
+      .forEach(
+        item => {
+
+          if (
+            item.pending
+          ) {
+
+            totalPending +=
+              item.amount;
+
+          }
+
+
+          const li =
+            document.createElement(
+              'li'
+            );
+
+
+          li.className =
+            `item-row ${
+              item.pending
+                ? 'pending'
+                : 'done'
+            }`;
+
+
+          li.innerHTML = `
+
+            <span class="item-label">
+
+              ${escapeHtml(
+                item.desc
+              )}
+
+            </span>
+
+            <div class="toggle-container">
+
+              <input
+                type="text"
+                inputmode="decimal"
+                class="editable-amount"
+                value="${
+                  inputAmount(
+                    Math.abs(
+                      item.amount
+                    )
+                  )
+                }"
+                onchange="updateFixedAmount(
+                  '${item.id}',
+                  this.value
+                )"
+              >
+
+              <span class="status-badge ${
+                item.pending
+                  ? 'pending'
+                  : 'done'
+              }">
+
+                ${
+                  item.pending
+                    ? 'À venir'
+                    : 'Débité'
+                }
+
+              </span>
+
+              <label class="switch">
+
+                <input
+                  type="checkbox"
+                  ${
+                    item.pending
+                      ? 'checked'
+                      : ''
+                  }
+                  onchange="toggleFixed(
+                    '${item.id}'
+                  )"
+                >
+
+                <span class="slider"></span>
+
+              </label>
+
+            </div>
+
+          `;
+
+
+          fixedList.appendChild(
+            li
+          );
+
+        }
+      );
+
+
+    /* ======================
+       DEPENSES PONCTUELLES
+    ====================== */
+
+    const customList =
+      document
+        .getElementById(
+          'customList'
+        );
+
+
+    customList.innerHTML =
+      '';
+
+
+    accountData.custom
+      .forEach(
+        item => {
+
+          if (
+            item.pending
+          ) {
+
+            totalPending +=
+              item.amount;
+
+          }
+
+
+          const isPositive =
+            item.amount > 0;
+
+
+          const color =
+            isPositive
+              ? 'var(--anis)'
+              : (
+                  item.pending
+                    ? 'var(--framboise)'
+                    : 'var(--anis)'
+                );
+
+
+          const li =
+            document.createElement(
+              'li'
+            );
+
+
+          li.className =
+            `item-row ${
+              item.pending
+                ? 'pending'
+                : 'done'
+            }`;
+
+
+          li.innerHTML = `
+
+            <span class="item-label">
+
+              ${escapeHtml(
+                item.desc
+              )}
+
+            </span>
+
+            <div class="toggle-container">
+
+              <span
+                class="item-amount"
+                style="
+                  color:${color};
+                ">
+
+                ${
+                  isPositive
+                    ? '+'
+                    : ''
+                }${formatAmount(
+                  item.amount
+                )}
+
+              </span>
+
+              <span class="status-badge ${
+                item.pending
+                  ? 'pending'
+                  : 'done'
+              }">
+
+                ${
+                  item.pending
+                    ? 'À venir'
+                    : 'Passé'
+                }
+
+              </span>
+
+              <label class="switch">
+
+                <input
+                  type="checkbox"
+                  ${
+                    item.pending
+                      ? 'checked'
+                      : ''
+                  }
+                  onchange="toggleCustom(
+                    '${item.id}'
+                  )"
+                >
+
+                <span class="slider"></span>
+
+              </label>
+
+              <button
+                class="delete-btn"
+                onclick="deleteCustom(
+                  '${item.id}'
+                )">
+
+                &times;
+
+              </button>
+
+            </div>
+
+          `;
+
+
+          customList.appendChild(
+            li
+          );
+
+        }
+      );
+
+
+    document
+      .getElementById(
+        'pendingAmount'
+      )
+      .innerText =
+      formatAmount(
+        totalPending
+      );
+
+
+    const realBalance =
+      accountData.bankBalance +
+      totalPending;
+
+
+    const realBalanceElement =
+      document
+        .getElementById(
+          'realBalance'
+        );
+
+
+    realBalanceElement.innerText =
+      formatAmount(
+        realBalance
+      );
+
+
+    realBalanceElement.style.color =
+      realBalance >= 0
+        ? 'var(--primary)'
+        : 'var(--framboise)';
+
+  }
+
+
+  /* ==========================================================
+     DEMARRAGE
+  ========================================================== */
+
+  checkNewMonth();
+
+  render();
+
+
+  /* ======================
+     SERVICE WORKER
+  ====================== */
+
+  if (
+    'serviceWorker' in navigator
+  ) {
+
+    window.addEventListener(
+      'load',
+      function() {
+
+        navigator
+          .serviceWorker
+          .register(
+            './sw.js'
+          )
+          .then(
+            () =>
+              console.log(
+                'Application hors ligne activée'
+              )
+          )
+          .catch(
+            error =>
+              console.error(
+                'Erreur service worker :',
+                error
+              )
+          );
+
+      }
+    );
+
+  }
+
+</script>
+
+</body>
+</html>
