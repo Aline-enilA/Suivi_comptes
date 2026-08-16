@@ -1464,127 +1464,64 @@
 
   function switchAccount(account) {
 
-    state.currentAccount =
-      account;
+  state.currentAccount = account;
+
+  // Tous les boutons redeviennent inactifs
+  document
+    .querySelectorAll('.account-btn')
+    .forEach(button => {
+      button.classList.remove('active');
+    });
+
+  // Active le bouton sélectionné
+  document
+    .getElementById('btn-' + account)
+    .classList.add('active');
 
 
-    document
-      .querySelectorAll(
-        '.account-btn'
-      )
-      .forEach(
-        button =>
-          button.classList.remove(
-            'active'
-          )
-      );
+  // Récupération des trois interfaces
+  const accountView =
+    document.getElementById('accountView');
+
+  const epargneView =
+    document.getElementById('epargneView');
+
+  const historiqueView =
+    document.getElementById('historiqueView');
 
 
-    document
-      .getElementById(
-        'btn-' + account
-      )
-      .classList.add(
-        'active'
-      );
+  // On cache TOUT d'abord
+  accountView.style.display = 'none';
+  epargneView.style.display = 'none';
+  historiqueView.style.display = 'none';
 
 
-    if (
-      account === 'historique'
-    ) {
+  // Puis on affiche UNIQUEMENT la bonne interface
+  if (account === 'epargne') {
 
-      document
-        .getElementById(
-          'accountView'
-        )
-        .classList.remove(
-          'active'
-        );
-
-      document
-        .getElementById(
-          'epargneView'
-        )
-        .classList.remove(
-          'active'
-        );
-
-      document
-        .getElementById(
-          'historiqueView'
-        )
-        .classList.add(
-          'active'
-        );
-
-      prepareHistorySelectors();
-
-      renderHistory();
-
-    }
-
-    else if (
-      account === 'epargne'
-    ) {
-
-      document
-        .getElementById(
-          'accountView'
-        )
-        .classList.remove(
-          'active'
-        );
-
-      document
-        .getElementById(
-          'historiqueView'
-        )
-        .classList.remove(
-          'active'
-        );
-
-      document
-        .getElementById(
-          'epargneView'
-        )
-        .classList.add(
-          'active'
-        );
-
-    }
-
-    else {
-
-      document
-        .getElementById(
-          'historiqueView'
-        )
-        .classList.remove(
-          'active'
-        );
-
-      document
-        .getElementById(
-          'epargneView'
-        )
-        .classList.remove(
-          'active'
-        );
-
-      document
-        .getElementById(
-          'accountView'
-        )
-        .classList.add(
-          'active'
-        );
-
-    }
-
-
-    render();
+    epargneView.style.display = 'block';
 
   }
+
+  else if (account === 'historique') {
+
+    historiqueView.style.display = 'block';
+
+    prepareHistorySelectors();
+    renderHistory();
+
+  }
+
+  else {
+
+    // Compte Perso ou Compte Joint
+    accountView.style.display = 'block';
+
+  }
+
+
+  render();
+}
 
 
   /* ==========================================================
